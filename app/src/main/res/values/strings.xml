@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">DicodingSubmissionAwalFundamental</string>
+    <string name="searchbar_hint">Cari Pengguna</string>
+    <string name="image_description">user profile</string>
+    <string name="page_title">Github User\'s Search</string>
+    <string name="detail_user_title">Detail User</string>
+    <string name="switch_mode">Switch Theme Mode</string>
+    <string name="tab_text_1">Followers</string>
+    <string name="tab_text_2">Following</string>
+    <string name="tabs">tabs</string>
+    <string name="favoriteUser">Add To Favorite Users</string>
+</resources>
