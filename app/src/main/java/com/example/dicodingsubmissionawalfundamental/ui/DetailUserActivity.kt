@@ -2,23 +2,30 @@ package com.example.dicodingsubmissionawalfundamental.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.dicodingsubmissionawalfundamental.R
+import com.example.dicodingsubmissionawalfundamental.data.Result
 import com.example.dicodingsubmissionawalfundamental.data.remote.response.DetailUserResponse
 import com.example.dicodingsubmissionawalfundamental.databinding.ActivityDetailUserBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class DetailUserActivity : AppCompatActivity() {
+class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityDetailUserBinding
+    private val detailUserViewModel by viewModels<DetailUserViewModel> {
+        DetailUserViewModelFactory.getInstance(application)
+    }
+    private var once = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,20 +53,10 @@ class DetailUserActivity : AppCompatActivity() {
             }
         }
 
-        val detailUserData = intent.getStringExtra(EXTRA_USERNAME)
-
-        val detailUserViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        )[DetailUserViewModel::class.java]
-
-        if (detailUserData != null) {
-            detailUserViewModel.findDetailUser(detailUserData)
-        }
-
+        val detailUsername = intent.getStringExtra(EXTRA_USERNAME)
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
-        sectionsPagerAdapter.username = detailUserData.toString()
+        sectionsPagerAdapter.username = detailUsername.toString()
         val viewPager: ViewPager2 = binding.viewPager
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = binding.tabs
@@ -67,13 +64,54 @@ class DetailUserActivity : AppCompatActivity() {
             tab.text = resources.getString(TAB_TITLES[position])
         }.attach()
 
-        detailUserViewModel.isLoading.observe(this) {
-            showLoading(it)
+        if (detailUsername != null) {
+            detailUserViewModel.findDetailUser(detailUsername).observe(this) { result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                        }
+
+                        is Result.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            setDetailUserData(result.data)
+                        }
+
+                        is Result.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(
+                                this, "Terjadi kesalahan " + result.error, Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
         }
 
         detailUserViewModel.detailUserResponse.observe(this) { detailUser ->
             setDetailUserData(detailUser)
         }
+
+        detailUserViewModel.getFavoriteUserByUsername(detailUsername.toString())
+            .observe(this) { favoriteUser ->
+                if (favoriteUser != null) {
+                    binding.fabFavorite.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            binding.fabFavorite.context, R.drawable.baseline_favorite_24
+                        )
+                    )
+                    once = false
+                } else {
+                    binding.fabFavorite.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            binding.fabFavorite.context, R.drawable.baseline_favorite_border_24
+                        )
+                    )
+                    once = true
+                }
+            }
+
+        binding.fabFavorite.setOnClickListener(this)
     }
 
     private fun setDetailUserData(detailUserdata: DetailUserResponse) {
@@ -89,20 +127,52 @@ class DetailUserActivity : AppCompatActivity() {
                 append(detailUserdata.following.toString())
                 append(" Following")
             }
+
         }
     }
 
-    private fun showLoading(state: Boolean) {
-        binding.progressBar.visibility = if (state) View.VISIBLE else View.GONE
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.fab_favorite -> {
+                val detailUsername = intent.getStringExtra(EXTRA_USERNAME)
+                val detailAvatarUrl = intent.getStringExtra(EXTRA_AVATAR_URL)
+                if (once) {
+                    detailUserViewModel.setFavoriteUser(
+                        detailUsername.toString(), detailAvatarUrl.toString()
+                    )
+                } else {
+                    detailUserViewModel.deleteFavoriteUser(
+                        detailUsername.toString(), detailAvatarUrl.toString()
+                    )
+                }
+
+
+//                detailUserViewModel.getFavoriteUserByUsername(detailUsername.toString())
+//                    .observe(this) {
+//                        if (it != null && !once) {
+//                            detailUserViewModel.deleteFavoriteUser(
+//                                detailUsername.toString(),
+//                                detailAvatarUrl.toString()
+//                            )
+//                            once = true
+//                        } else {
+//                            detailUserViewModel.setFavoriteUser(
+//                                detailUsername.toString(),
+//                                detailAvatarUrl.toString()
+//                            )
+//                        }
+//                    }
+            }
+        }
     }
 
     companion object {
         const val EXTRA_USERNAME = "charlesbintang"
+        const val EXTRA_AVATAR_URL = "charlesbintang"
 
         @StringRes
         private val TAB_TITLES = intArrayOf(
-            R.string.tab_text_1,
-            R.string.tab_text_2
+            R.string.tab_text_1, R.string.tab_text_2
         )
     }
 }

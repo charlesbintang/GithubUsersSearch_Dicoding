@@ -22,7 +22,8 @@ class UserAdapter : ListAdapter<ItemsItem, UserAdapter.MyViewHolder>(DIFF_CALLBA
 
         holder.itemView.setOnClickListener {
             val intentDetail = Intent(holder.itemView.context, DetailUserActivity::class.java)
-            intentDetail.putExtra(DetailUserActivity.EXTRA_USERNAME, holder.binding.tvUserName.text)
+            intentDetail.putExtra(DetailUserActivity.EXTRA_AVATAR_URL, user.avatarUrl)
+            intentDetail.putExtra(DetailUserActivity.EXTRA_USERNAME, user.login)
             holder.itemView.context.startActivity(intentDetail)
         }
     }
@@ -30,7 +31,8 @@ class UserAdapter : ListAdapter<ItemsItem, UserAdapter.MyViewHolder>(DIFF_CALLBA
 
     class MyViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: ItemsItem) {
-            Glide.with(binding.civUserProfile).load("${user.avatarUrl}")
+            Glide.with(binding.civUserProfile)
+                .load("${user.avatarUrl}")
                 .into(binding.civUserProfile)
             binding.tvUserName.text = "${user.login}"
         }

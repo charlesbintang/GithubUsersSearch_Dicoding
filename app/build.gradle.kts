@@ -43,23 +43,34 @@ android {
 }
 
 dependencies {
+    //ui
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.glide)
     implementation(libs.circleimageview)
+    implementation(libs.material)
+    implementation(libs.androidx.viewpager2)
+
+    //retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
-    implementation(libs.material)
-    implementation(libs.androidx.viewpager2)
+
+    //coroutine support
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.room.ktx)
+
+    //room
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler.v260)
+    kapt(libs.androidx.room.compiler.v261)
+
+    //testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

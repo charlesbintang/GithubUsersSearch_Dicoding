@@ -2,20 +2,25 @@ package com.example.dicodingsubmissionawalfundamental.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicodingsubmissionawalfundamental.R
+import com.example.dicodingsubmissionawalfundamental.data.Result
 import com.example.dicodingsubmissionawalfundamental.data.remote.response.ItemsItem
 import com.example.dicodingsubmissionawalfundamental.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val mainViewModel by viewModels<MainViewModel> {
+        MainViewModelFactory.getInstance(application)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,11 +32,6 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        val mainViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        )[MainViewModel::class.java]
 
         with(binding) {
             searchView.setupWithSearchBar(searchBar)
@@ -47,7 +47,38 @@ class MainActivity : AppCompatActivity() {
                     }
                     searchView.hide()
                     USER_ID = searchBar.text.toString()
-                    mainViewModel.findUser(USER_ID)
+                    mainViewModel.findUser(USER_ID).observe(this@MainActivity) { result ->
+                        if (result != null) {
+                            when (result) {
+                                is Result.Loading -> {
+                                    binding.apply {
+                                        progressBar.visibility = View.VISIBLE
+                                        rvUser.visibility = View.GONE
+                                    }
+                                }
+
+                                is Result.Success -> {
+                                    binding.apply {
+                                        progressBar.visibility = View.GONE
+                                        rvUser.visibility = View.VISIBLE
+                                    }
+                                    setUserData(result.data)
+                                }
+
+                                is Result.Error -> {
+                                    binding.apply {
+                                        progressBar.visibility = View.GONE
+                                        rvUser.visibility = View.VISIBLE
+                                    }
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Terjadi kesalahan " + result.error,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
                     false
                 }
 
@@ -76,24 +107,12 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.listUser.observe(this) { userData ->
             setUserData(userData)
         }
-
-        mainViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
     }
-
 
     private fun setUserData(userData: List<ItemsItem?>?) {
         val adapter = UserAdapter()
         adapter.submitList(userData)
         binding.rvUser.adapter = adapter
-    }
-
-    private fun showLoading(state: Boolean) {
-        binding.apply {
-            progressBar.visibility = if (state) View.VISIBLE else View.GONE
-            rvUser.visibility = if (state) View.GONE else View.VISIBLE
-        }
     }
 
     companion object {

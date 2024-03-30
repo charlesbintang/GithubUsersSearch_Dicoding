@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dicodingsubmissionawalfundamental.data.Result
 import com.example.dicodingsubmissionawalfundamental.data.remote.response.ItemsItem
 import com.example.dicodingsubmissionawalfundamental.databinding.FragmentDetailFollowersFollowingUserBinding
 
@@ -17,6 +19,10 @@ class DetailFollowersFollowingUserFragment : Fragment() {
 
     private var position = 0
     private var username = ""
+
+    private val detailUserViewModel by viewModels<DetailUserViewModel> {
+        DetailUserViewModelFactory.getInstance(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,30 +49,60 @@ class DetailFollowersFollowingUserFragment : Fragment() {
         val itemDecoration = DividerItemDecoration(requireContext(), layoutManager.orientation)
         binding.rvFollowingFollowers.addItemDecoration(itemDecoration)
 
-        val detailUserViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        )[DetailUserViewModel::class.java]
-
         if (position == 1) {
-            detailUserViewModel.findFollowersUser(username)
-            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
-                setUserData(userData)
-            }
+            detailUserViewModel.findFollowersUser(username).observe(viewLifecycleOwner) { result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                        }
 
-            detailUserViewModel.isLoading.observe(viewLifecycleOwner) {
-                showLoading(it)
-            }
+                        is Result.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            setUserData(result.data)
+                        }
 
+                        is Result.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(
+                                context,
+                                "Terjadi kesalahan " + result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+//            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
+//                setUserData(userData)
+//            }
         } else {
-            detailUserViewModel.findFollowingUser(username)
-            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
-                setUserData(userData)
-            }
+            detailUserViewModel.findFollowingUser(username).observe(viewLifecycleOwner) { result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                        }
 
-            detailUserViewModel.isLoading.observe(viewLifecycleOwner) {
-                showLoading(it)
+                        is Result.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            setUserData(result.data)
+                        }
+
+                        is Result.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(
+                                context,
+                                "Terjadi kesalahan " + result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
             }
+//            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
+//                setUserData(userData)
+//            }
         }
     }
 
@@ -74,10 +110,6 @@ class DetailFollowersFollowingUserFragment : Fragment() {
         val adapter = UserAdapter()
         adapter.submitList(userData)
         binding.rvFollowingFollowers.adapter = adapter
-    }
-
-    private fun showLoading(state: Boolean) {
-        binding.progressBar.visibility = if (state) View.VISIBLE else View.GONE
     }
 
     companion object {
