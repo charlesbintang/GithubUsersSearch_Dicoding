@@ -94,20 +94,20 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
 
         detailUserViewModel.getFavoriteUserByUsername(detailUsername.toString())
             .observe(this) { favoriteUser ->
-                if (favoriteUser != null) {
+                once = if (favoriteUser != null) {
                     binding.fabFavorite.setImageDrawable(
                         ContextCompat.getDrawable(
                             binding.fabFavorite.context, R.drawable.baseline_favorite_24
                         )
                     )
-                    once = false
+                    false
                 } else {
                     binding.fabFavorite.setImageDrawable(
                         ContextCompat.getDrawable(
                             binding.fabFavorite.context, R.drawable.baseline_favorite_border_24
                         )
                     )
-                    once = true
+                    true
                 }
             }
 
@@ -168,7 +168,7 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
         const val EXTRA_USERNAME = "charlesbintang"
-        const val EXTRA_AVATAR_URL = "charlesbintang"
+        const val EXTRA_AVATAR_URL = "https://avatars.githubusercontent.com/u/24184036?v=4"
 
         @StringRes
         private val TAB_TITLES = intArrayOf(

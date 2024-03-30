@@ -1,6 +1,7 @@
 package com.example.dicodingsubmissionawalfundamental.ui
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,6 +25,7 @@ class UserAdapter : ListAdapter<ItemsItem, UserAdapter.MyViewHolder>(DIFF_CALLBA
             val intentDetail = Intent(holder.itemView.context, DetailUserActivity::class.java)
             intentDetail.putExtra(DetailUserActivity.EXTRA_AVATAR_URL, user.avatarUrl)
             intentDetail.putExtra(DetailUserActivity.EXTRA_USERNAME, user.login)
+            Log.d("onBindViewHolder", "avatarUrl = ${user.avatarUrl}")
             holder.itemView.context.startActivity(intentDetail)
         }
     }
