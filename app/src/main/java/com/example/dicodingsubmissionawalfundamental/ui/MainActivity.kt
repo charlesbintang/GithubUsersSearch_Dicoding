@@ -1,5 +1,6 @@
 package com.example.dicodingsubmissionawalfundamental.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -92,6 +93,12 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     }
+                    true
+                }
+
+                R.id.favorite_menu -> {
+                    val moveToFavorite = Intent(this@MainActivity, FavoriteActivity::class.java)
+                    this.startActivities(arrayOf(moveToFavorite))
                     true
                 }
 

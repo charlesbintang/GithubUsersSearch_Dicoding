@@ -73,9 +73,9 @@ class DetailFollowersFollowingUserFragment : Fragment() {
                     }
                 }
             }
-//            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
-//                setUserData(userData)
-//            }
+            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
+                setUserData(userData)
+            }
         } else {
             detailUserViewModel.findFollowingUser(username).observe(viewLifecycleOwner) { result ->
                 if (result != null) {
@@ -100,9 +100,9 @@ class DetailFollowersFollowingUserFragment : Fragment() {
                     }
                 }
             }
-//            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
-//                setUserData(userData)
-//            }
+            detailUserViewModel.listUser.observe(viewLifecycleOwner) { userData ->
+                setUserData(userData)
+            }
         }
     }
 

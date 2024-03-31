@@ -19,7 +19,7 @@ class FavoriteRepository private constructor(
     private val _detailUserResponse = MutableLiveData<DetailUserResponse>()
     val detailUserResponse: LiveData<DetailUserResponse> = _detailUserResponse
 
-    fun getAllFavoriteUser(): LiveData<FavoriteUserEntity> {
+    fun getAllFavoriteUser(): LiveData<List<FavoriteUserEntity>> {
         return favoriteDao.getAllFavoriteUser()
     }
 

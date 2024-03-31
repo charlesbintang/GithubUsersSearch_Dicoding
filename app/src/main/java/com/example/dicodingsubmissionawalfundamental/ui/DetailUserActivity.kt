@@ -145,23 +145,6 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
                         detailUsername.toString(), detailAvatarUrl.toString()
                     )
                 }
-
-
-//                detailUserViewModel.getFavoriteUserByUsername(detailUsername.toString())
-//                    .observe(this) {
-//                        if (it != null && !once) {
-//                            detailUserViewModel.deleteFavoriteUser(
-//                                detailUsername.toString(),
-//                                detailAvatarUrl.toString()
-//                            )
-//                            once = true
-//                        } else {
-//                            detailUserViewModel.setFavoriteUser(
-//                                detailUsername.toString(),
-//                                detailAvatarUrl.toString()
-//                            )
-//                        }
-//                    }
             }
         }
     }
