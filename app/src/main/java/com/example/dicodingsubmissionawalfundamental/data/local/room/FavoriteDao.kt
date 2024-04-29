@@ -20,10 +20,10 @@ interface FavoriteDao {
     @Delete
     suspend fun delete(favoriteUserEntity: FavoriteUserEntity)
 
-    @Query("SELECT * from favoriteuserentity ORDER BY username ASC")
+    @Query("SELECT * from FavoriteUserEntity ORDER BY username ASC")
     fun getAllFavoriteUser(): LiveData<List<FavoriteUserEntity>>
 
-    @Query("SELECT * FROM favoriteuserentity WHERE username = :username")
+    @Query("SELECT * FROM FavoriteUserEntity WHERE username = :username")
     fun getFavoriteUserByUsername(username: String): LiveData<FavoriteUserEntity>
 
 }

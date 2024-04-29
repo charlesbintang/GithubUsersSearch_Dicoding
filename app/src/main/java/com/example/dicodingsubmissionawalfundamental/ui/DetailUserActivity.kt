@@ -32,7 +32,7 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
         enableEdgeToEdge()
         binding = ActivityDetailUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -112,6 +112,37 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
             }
 
         binding.fabFavorite.setOnClickListener(this)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        val detailUsername = intent.getStringExtra(EXTRA_USERNAME)
+        if (detailUsername != null) {
+            detailUserViewModel.findDetailUser(detailUsername).observe(this) { result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                        }
+
+                        is Result.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            setDetailUserData(result.data)
+                        }
+
+                        is Result.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(
+                                this, "Terjadi kesalahan " + result.error, Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
+        detailUserViewModel.detailUserResponse.observe(this) { detailUser ->
+            setDetailUserData(detailUser)
+        }
     }
 
     private fun setDetailUserData(detailUserdata: DetailUserResponse) {

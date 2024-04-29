@@ -89,7 +89,7 @@ class FavoriteRepository private constructor(
         private var instance: FavoriteRepository? = null
         fun getInstance(
             apiService: ApiService,
-            favoriteDao: FavoriteDao
+            favoriteDao: FavoriteDao,
         ): FavoriteRepository = instance ?: synchronized(this) {
             instance ?: FavoriteRepository(apiService, favoriteDao)
         }.also { instance = it }

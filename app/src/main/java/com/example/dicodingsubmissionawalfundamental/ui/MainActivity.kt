@@ -18,25 +18,38 @@ import com.example.dicodingsubmissionawalfundamental.data.remote.response.ItemsI
 import com.example.dicodingsubmissionawalfundamental.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private val mainViewModel by viewModels<MainViewModel> {
         MainViewModelFactory.getInstance(application)
     }
+    private var once: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
+        val layoutManager = LinearLayoutManager(this)
+        val itemDecoration = DividerItemDecoration(this, layoutManager.orientation)
+
+        fun setUserData(userData: List<ItemsItem?>?) {
+            val adapter = UserAdapter()
+            adapter.submitList(userData)
+            binding.rvUser.adapter = adapter
+        }
+
         with(binding) {
             searchView.setupWithSearchBar(searchBar)
-            searchBar.setText(USER_ID)
+
+            if (searchBar.text.isEmpty()) {
+                tvNoData.visibility = View.VISIBLE
+            }
+
             searchView
                 .editText
                 .setOnEditorActionListener { _, _, _ ->
@@ -45,6 +58,7 @@ class MainActivity : AppCompatActivity() {
                         searchBar.setText(USER_ID)
                     } else {
                         searchBar.setText(searchView.text)
+                        tvNoData.visibility = View.GONE
                     }
                     searchView.hide()
                     USER_ID = searchBar.text.toString()
@@ -83,43 +97,46 @@ class MainActivity : AppCompatActivity() {
                     false
                 }
 
-        }
+            rvUser.layoutManager = layoutManager
+            rvUser.addItemDecoration(itemDecoration)
 
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.switch_mode -> {
-                    if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    } else {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            searchBar.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.switch_mode -> {
+                        mainViewModel.getThemeSettings()
+                            .observe(this@MainActivity) { isDarkModeActive ->
+                                once = !isDarkModeActive
+                            }
+                        mainViewModel.saveThemeSetting(once)
+                        true
                     }
-                    true
-                }
 
-                R.id.favorite_menu -> {
-                    val moveToFavorite = Intent(this@MainActivity, FavoriteActivity::class.java)
-                    this.startActivities(arrayOf(moveToFavorite))
-                    true
-                }
+                    R.id.favorite_menu -> {
+                        val moveToFavorite = Intent(this@MainActivity, FavoriteActivity::class.java)
+                        this@MainActivity.startActivity(moveToFavorite)
+                        true
+                    }
 
-                else -> false
+                    else -> false
+                }
             }
         }
-
-        val layoutManager = LinearLayoutManager(this)
-        binding.rvUser.layoutManager = layoutManager
-        val itemDecoration = DividerItemDecoration(this, layoutManager.orientation)
-        binding.rvUser.addItemDecoration(itemDecoration)
 
         mainViewModel.listUser.observe(this) { userData ->
             setUserData(userData)
         }
-    }
 
-    private fun setUserData(userData: List<ItemsItem?>?) {
-        val adapter = UserAdapter()
-        adapter.submitList(userData)
-        binding.rvUser.adapter = adapter
+        mainViewModel.getThemeSettings()
+            .observe(this@MainActivity) { isDarkModeActive ->
+                if (isDarkModeActive) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    binding.searchBar.menu.getItem(0).setIcon(R.drawable.baseline_favorite_24_white)
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+            }
+
+
     }
 
     companion object {

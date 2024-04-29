@@ -24,7 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                app:menu="@menu/option_menu"
                 app:title="@string/detail_user_title" />
 
         </com.google.android.material.appbar.AppBarLayout>

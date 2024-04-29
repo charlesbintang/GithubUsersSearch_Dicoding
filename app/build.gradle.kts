@@ -17,7 +17,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "KEY", "\"token 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\"")
+        buildConfigField("String", "KEY", "\"token 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\"")
+        buildConfigField("String", "BASE_URL", "\"https://api.github.com/\"")
     }
 
     buildTypes {
@@ -43,7 +44,6 @@ android {
 }
 
 dependencies {
-    //ui
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -55,22 +55,17 @@ dependencies {
     implementation(libs.circleimageview)
     implementation(libs.material)
     implementation(libs.androidx.viewpager2)
-
-    //retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
-
-    //coroutine support
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.room.ktx)
-
-    //room
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler.v261)
-
-    //testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

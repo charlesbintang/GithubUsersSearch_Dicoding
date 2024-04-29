@@ -14,7 +14,7 @@ abstract class FavoriteDatabase : RoomDatabase() {
         @Volatile
         private var instance: FavoriteDatabase? = null
 
-        fun getInstace(context: Context): FavoriteDatabase =
+        fun getInstance(context: Context): FavoriteDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,

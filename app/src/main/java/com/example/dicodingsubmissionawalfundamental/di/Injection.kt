@@ -8,7 +8,7 @@ import com.example.dicodingsubmissionawalfundamental.data.remote.retrofit.ApiCon
 object Injection {
     fun provideRepository(context: Context): FavoriteRepository {
         val apiService = ApiConfig.getApiService()
-        val database = FavoriteDatabase.getInstace(context)
+        val database = FavoriteDatabase.getInstance(context)
         val dao = database.favoriteDao()
         return FavoriteRepository.getInstance(apiService, dao)
     }

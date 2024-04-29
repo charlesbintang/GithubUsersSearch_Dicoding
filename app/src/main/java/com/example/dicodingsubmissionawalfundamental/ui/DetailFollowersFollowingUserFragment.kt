@@ -15,7 +15,9 @@ import com.example.dicodingsubmissionawalfundamental.databinding.FragmentDetailF
 
 class DetailFollowersFollowingUserFragment : Fragment() {
     private var _binding: FragmentDetailFollowersFollowingUserBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding
+            ?: throw IllegalStateException("Binding should not be accessed before onCreateView or after onDestroyView")
 
     private var position = 0
     private var username = ""
@@ -41,7 +43,7 @@ class DetailFollowersFollowingUserFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         arguments?.let {
             position = it.getInt(ARG_POSITION)
-            username = it.getString(ARG_USERNAME)!!
+            username = it.getString(ARG_USERNAME).toString()
         }
 
         val layoutManager = LinearLayoutManager(requireContext())
